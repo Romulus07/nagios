@@ -1,0 +1,8 @@
+Commande linux
+ssh -V
+OpenSSH_8.0p1, OpenSSL 1.1.1k  FIPS 25 Mar 2021
+hostnamctl
+ssh -v romu@localhost ==>verbose
+TAB TAB ===> avoir des suggestion
+man man
+ls -la

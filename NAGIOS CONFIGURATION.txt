@@ -1,0 +1,219 @@
+Changement ip en fixe et nom de la vm
+
+Fichier /etc/hosts et /etc/resolv.conf :
+
+/etc/resolve.conf
+
+===================================================================================================================
+
+
+cd /usr/local/nagios/etc/
+
+===================================================================================================================
+
+
+Création d'un dossier conf.d :
+
+mkdir conf.d
+
+===================================================================================================================
+
+Configuration des groupes d'hôtes (groups.cfg) :
+
+
+
+root@nagios-vm:/usr/local/nagios/etc/conf.d# vim groups.cfg
+define hostgroup {
+        hostgroup_name linux-server
+        alias          Linux Servers
+}
+
+define hostgroup {
+        hostgroup_name linux-web-server
+        alias          Linux Web Server
+}
+
+
+===================================================================================================================
+
+Configuration des hôtes (hosts.cfg) :
+
+
+root@nagios-vm:/usr/local/nagios/etc/conf.d# vim hosts.cfg
+define host {
+        use     linux-server
+        host_name    NAGIOS
+        alias        NAGIOS
+        address      20.199.112.188
+        hostgroups   linux-server
+        register     1
+}
+
+
+===================================================================================================================
+
+Configuration des services (services.cfg) :
+
+
+root@nagios-vm:/usr/local/nagios/etc/conf.d# vim services.cfg
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	protocol : ICMP
+	check_command		check_ping!100.0,20%!500.0,60%
+}
+
+
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	protocol : SSH
+	check_command		check_ssh
+}
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description     CHKDSK	
+	check_command	        check_nrpe!check_disk	
+}
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	apt update	
+	check_command	        check_nrpe!check_apt	
+}
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	check users	
+	check_command	        check_nrpe!check_users	
+
+}
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	Load Zombie	
+	check_command	        check_nrpe!check_zombie_procs
+
+}
+
+define service {
+	use			generic-service
+	hostgroups		linux-server
+	service_description	load process	
+	check_command	        check_nrpe!check_procs
+
+}
+
+
+
+===================================================================================================================
+
+Configuration des contacts (contacts.cfg) et des groupes de contacts :
+
+
+root@nagios-vm:/usr/local/nagios/etc/objects# vim contacts.cfg
+define contact {
+        contact_name            nagiosadmin
+        use                     generic-contact
+        alias                   Nagios Admin
+        email                   toto@gmail.com
+}
+
+define contactgroup {
+        contactgroup_name       admins
+        alias                   Nagios Administrators
+        members                 nagiosadmin
+}
+
+
+
+
+
+===================================================================================================================
+
+Configuration des commandes (commands.cfg) :
+
+
+root@nagios-vm:/usr/local/nagios/etc/objects# vim commands.cfg
+
+
+
+# check_nrpe command definition
+define command {
+command_name check_nrpe
+command_line /usr/local/nagios/libexec/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+# check_nrpe_arg command definition
+define command {
+command_name check_nrpe_arg
+command_line /usr/local/nagios/libexec/check_nrpe -H $HOSTADDRESS$ -c $ARG1$ -a $ARG2$
+}
+
+
+===================================================================================================================
+
+Autorisation NRPE sur les clients :
+Fichier de configuration du client (nrpe.cfg) :
+
+
+
+install NRPE
+
+https://support.nagios.com/kb/article/nrpe-how-to-install-nrpe-v4-from-source-515.html#Debian
+
+
+root@nagios-vm:/usr/local/nagios/etc/objects# vim commands.cfg
+
+root@nagios-vm:/usr/local/nagios/etc/nrpe.cfg
+
+Fichier :
+...
+command[check_apt]=/usr/local/nagios/libexec/check_apt
+... 
+
+
+Vérification des chemins et des permissions :
+
+
+Fichier :
+...
+allowed_hosts=127.0.0.1,IP
+...
+dont_blame_nrpe=1
+...
+
+command[nom]=/usr/local/nagios/libexec
+
+
+
+
+===================================================================================================================
+
+CLIENT NRPE
+
+
+apt install -y nagios-nrpe-server nagios-nrpe-plugin nrpe-ng nagios-nrpe-plugin
+apt install nagios-plugin-check-multi
+
+
+===================================================================================================================
+
+CLIENT NRPE
+
+root@nagios-vm:/usr/local/nagios/etc/nrpe.cfg
+
+Fichier :
+...
+command[check_apt]=/usr/lib/nagios/plugins/check_apt
+... 
+
+
+Fichier :
+...
+allowed_hosts=127.0.0.1,IP
+...
+dont_blame_nrpe=1
+...
+
+command[nom]=/usr/local/nagios/libexec

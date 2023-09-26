@@ -1,0 +1,42 @@
+nslookup 1.1.1.1
+/etc/network/interfaces
+/etc/resolv.conf
+systemctl restart networking.service
+ifup ens33
+Non-autoritative ==> pas le ns
+dig soa www.google.com
+ping -c2
+nagios 1er
+centreon etait un plugin
+samba dc
+sudo passwd
+etc ==> descrip
+var ==>
+opt ==>
+mnt ==>
+media ==>
+/etc/opt
+root mode rescue
+debian ==> stable
+nrpe ==>
+top ==>
+swap ==>
+
+Install nagios a partir des sources
+
+https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html#Debian
+
+apt install linux-headers-$(uname -r) build-essential -y ==>
+
+site nagios > download
+
+
+
+
+
+
+
+
+
+
+
